@@ -1,3 +1,4 @@
+from this import s
 from typing import Optional
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
@@ -34,14 +35,18 @@ def getCourses(db: Session = Depends(get_db)):
 
 @app.get("/courses/{course_id}")
 def getCourse(course_id: int, db: Session = Depends(get_db)):
-    # course = db.filter()
-    return fakedb[course_id-1]
+    course = db.query(models.Courses).filter(
+        models.Courses.id == course_id).first()
+
+    if not course:
+        raise HTTPException(status_code=404,
+                            detail=f"post with id: {course_id} does not exists")
+    return {"data": course}
 
 
 @app.post("/courses")
 def addCourse(course: Course, db: Session = Depends(get_db)):
-    new_post = models.Courses(
-        id=course.id, name=course.name, price=course.price, is_early_bird=course.is_early_bird)
+    new_post = models.Courses(**course.dict())
 
     db.add(new_post)
     db.commit()
@@ -50,11 +55,30 @@ def addCourse(course: Course, db: Session = Depends(get_db)):
 
 
 @app.delete("/courses/{course_id}")
-def deleteCourse(course_id: int):
-    fakedb.pop(course_id)
+def deleteCourse(course_id: int, db: Session = Depends(get_db)):
+    course = db.query(models.Courses).filter(
+        models.Courses.id == course_id)
+
+    if course.first() == None:
+        raise HTTPException(status_code=404,
+                            detail=f"post with id: {course_id} does not exists")
+
+    course.delete(synchronize_session=False)
+    db.commit()
+
     return {"msg": "course deleted successfully"}
 
 
-@app.get("/sql")
-def test(db: Session = Depends(get_db)):
-    return {"msg": "successful"}
+@app.put("/courses/{course_id}")
+def update(course_id: int, course: Course, db: Session = Depends(get_db)):
+    course_query = db.query(models.Courses).filter(
+        models.Courses.id == course_id)
+
+    if course_query.first() == None:
+        raise HTTPException(status_code=404,
+                            detail=f"post with id: {course_id} does not exists")
+
+    course_query.update(course.dict(), synchronize_session=False)
+    db.commit()
+
+    return {"msg": "course updated successful"}

@@ -32,7 +32,7 @@ def verify_token(token: str, credentials_exceptions):
         if id is None:
             raise credentials_exceptions
 
-        token_data = schemas.TokenData
+        token_data = schemas.TokenData(id=id)
     except JWTError:
         raise credentials_exceptions
 
@@ -45,6 +45,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
     token = verify_token(token, credentials_exception)
 
-    user = db.query(models.User).filter(models.User.id == token.id).first()
+    user = db.query(models.Users).filter(models.Users.id == token.id).first()
 
     return user

@@ -3,16 +3,23 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 
 
-class Course(BaseModel):
-    id: int
-    name: str
-    price: float
-    is_early_bird: Optional[bool] = None
-
-
 class User(BaseModel):
     email: EmailStr
     password: str
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    id: Optional[str] = None
 
 
 class UserOut(BaseModel):
@@ -24,14 +31,19 @@ class UserOut(BaseModel):
         orm_mode = True
 
 
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
+class Course(BaseModel):
+    id: int
+    name: str
+    price: float
+    owner_id: int
+    owner: User
+    is_early_bird: Optional[bool] = None
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
+    class Config:
+        orm_mode = True
 
-class TokenData(BaseModel):
-    id: Optional[str] = None
-    
+
+class CourseCreate(BaseModel):
+    name: str
+    price: float
+    is_early_bird: Optional[bool] = None

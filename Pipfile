@@ -5,11 +5,13 @@ name = "pypi"
 
 [packages]
 uvicorn = "*"
-fastapi = "*"
+fastapi = {extras = ["all"], version = "*"}
 sqlalchemy = "*"
 psycopg2-binary = "*"
 passlib = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
+gunicorn = "*"
+pydantic = {extras = ["email"], version = "*"}
 
 [dev-packages]
 

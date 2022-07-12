@@ -1,5 +1,7 @@
-fastapi-all
+fastapi[all]
 python-jose[cryptography]
 sqlalchemy
 psycopg2-binary
 passlib
+gunicorn
+pydantic[email]
